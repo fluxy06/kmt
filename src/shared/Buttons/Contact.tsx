@@ -4,7 +4,7 @@ import React from "react";
 type ContactButtonProps = {
   onClick?: () => void;
   width?: { min: string; preferred: string; max: string };
-    height?: { min: string; preferred: string; max: string };
+  height?: { min: string; preferred: string; max: string };
   label: string
 };
 
