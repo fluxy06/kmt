@@ -1,0 +1,16 @@
+<Card 
+          bilbord={{
+            id: 1,
+            title: 'Сити-щиты',
+            size: 'размеры: 10x20',
+            imageUrl: 'https://via.placeholder.com/150'
+          }} 
+          width={{ min: '288px', preferred: '50vw', max: '380px' }}
+          
+          />
+
+
+
+<InfoBlock title='Адрес' smile='📍' description='ул. Ленина, 180, г. Богородск, 607600'
+          width={{ min: '140px', preferred: '30vw', max: '332.97px' }}
+          />
