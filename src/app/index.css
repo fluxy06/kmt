@@ -14,15 +14,22 @@
 
 a {
     font-weight: 500;
-    color: #000000;
+    font-family: "Montserrat Alternates", sans-serif;
+    color: #ffffff;
     text-decoration: inherit;
+    transition: 0.3s ease-in-out;
+    font-size: clamp(14px, 1.5vw, 18px);
+    text-wrap: nowrap;
+    @media screen and (max-width: 400px) {
+        font-size: clamp(10px, 3vw, 14px);
+    }
 }
 
 body {
     margin: 0;
     display: flex;
-    place-items: center;
     min-width: 320px;
+    padding-top: 80px;
     min-height: 100vh;
 }
 
