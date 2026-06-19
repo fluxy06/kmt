@@ -1,0 +1,95 @@
+/* Static background — no animations, no filters, no repaints.
+   Softness comes from the radial-gradient falloff itself, not CSS blur.
+   Because nothing here moves, the backdrop-filter surfaces above it are
+   never invalidated at idle → the GPU compositor stays at rest. */
+
+.kmt-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    /* blob colors (dark theme) — фирменная зелёная палитра: #1f8e0e → #3ebf2a → #8ef56f */
+    --blob-green: rgba(81, 213, 54, 0.20);
+    --blob-lime: rgba(142, 245, 111, 0.14);
+    --blob-teal: rgba(34, 197, 94, 0.16);
+    --orb-core: rgba(190, 255, 170, 0.95);
+    --orb-glow: rgba(81, 213, 54, 0.5);
+    --orb-ring: rgba(142, 245, 111, 0.4);
+}
+
+:root[data-theme="light"] .kmt-bg {
+    --blob-green: rgba(81, 213, 54, 0.22);
+    --blob-lime: rgba(62, 191, 42, 0.12);
+    --blob-teal: rgba(34, 197, 94, 0.18);
+    --orb-core: rgba(38, 165, 13, 0.85);
+    --orb-glow: rgba(81, 213, 54, 0.38);
+    --orb-ring: rgba(38, 165, 13, 0.35);
+}
+
+.kmt-bg__blob {
+    position: absolute;
+    width: 85vmax;
+    height: 85vmax;
+    border-radius: 50%;
+}
+
+.kmt-bg__blob--a {
+    top: -42vmax;
+    left: -32vmax;
+    background: radial-gradient(circle, var(--blob-green) 0%, transparent 62%);
+}
+
+.kmt-bg__blob--b {
+    top: -38vmax;
+    right: -36vmax;
+    background: radial-gradient(circle, var(--blob-lime) 0%, transparent 60%);
+}
+
+.kmt-bg__blob--c {
+    bottom: -46vmax;
+    left: 8vmax;
+    background: radial-gradient(circle, var(--blob-teal) 0%, transparent 62%);
+}
+
+/* ---- A single static glowing accent orb in the upper-right ---- */
+.kmt-orb {
+    position: absolute;
+    top: 18vh;
+    left: 78vw;
+    width: 120px;
+    height: 120px;
+    margin: -60px 0 0 -60px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, var(--orb-core) 0%, transparent 18%),
+        radial-gradient(circle, var(--orb-glow) 0%, transparent 65%);
+    opacity: 0.92;
+}
+
+.kmt-orb__ring {
+    position: absolute;
+    inset: -22px;
+    border-radius: 50%;
+    border: 1px solid var(--orb-ring);
+}
+
+.kmt-orb__ring::before {
+    content: "";
+    position: absolute;
+    top: -3.5px;
+    left: 50%;
+    width: 7px;
+    height: 7px;
+    margin-left: -3.5px;
+    border-radius: 50%;
+    background: var(--orb-core);
+    box-shadow: 0 0 10px 2px var(--orb-glow);
+}
+
+/* the orb is decorative — hide on small screens to save battery/GPU */
+@media (max-width: 640px) {
+    .kmt-orb {
+        display: none;
+    }
+}

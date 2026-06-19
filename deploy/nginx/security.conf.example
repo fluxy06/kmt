@@ -1,0 +1,72 @@
+# Example Nginx hardening + basic DDoS/rate limit profile for KMT
+# Use as include in your HTTPS server block and tune limits to your traffic.
+
+# --- Rate limit zones ---
+# general frontend/API traffic
+limit_req_zone $binary_remote_addr zone=kmt_general:10m rate=20r/s;
+# strict zone for admin endpoints
+limit_req_zone $binary_remote_addr zone=kmt_admin:10m rate=5r/s;
+# strict zone for analytics ingestion
+limit_req_zone $binary_remote_addr zone=kmt_analytics:10m rate=10r/s;
+# connection limits per IP
+limit_conn_zone $binary_remote_addr zone=kmt_conn:10m;
+
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+
+    # HSTS (enable after confirming HTTPS works everywhere)
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+
+    # CSP should ideally be delivered by backend and tuned to exact assets.
+
+    # basic anti-abuse connection limits
+    limit_conn kmt_conn 40;
+
+    # public app/static
+    location / {
+        limit_req zone=kmt_general burst=40 nodelay;
+        try_files $uri /index.html;
+    }
+
+    # admin validation / admin-sensitive routes
+    location ~ ^/kmt/admin {
+        limit_req zone=kmt_admin burst=10 nodelay;
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # services mutations + general API
+    location /kmt/services {
+        limit_req zone=kmt_general burst=25 nodelay;
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # analytics ingest endpoint (often abused)
+    location = /kmt/analytics/collect {
+        limit_req zone=kmt_analytics burst=20 nodelay;
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # cache static assets aggressively (hashed files)
+    location ~* \.(js|css|svg|png|jpg|jpeg|gif|ico|webp|woff2?)$ {
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+        try_files $uri =404;
+    }
+}

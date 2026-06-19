@@ -18,7 +18,16 @@ const Icon: React.FC<IconProps> = ({ src, width, height}) => {
 
     if (!src) return null;
     
-    return <img src={src} alt="icon" className="w-full h-full object-contain"  style={{width: widthAdaptive, height: heightAdaptive}}/>;
+    return (
+        <img
+            src={src}
+            alt="icon"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-contain"
+            style={{width: widthAdaptive, height: heightAdaptive}}
+        />
+    );
 }
 
 export default Icon;

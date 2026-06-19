@@ -6,9 +6,11 @@ export const contactFormSchema = z.object({
   email: z.string().email("Некорректный email"),
   phone: z
     .string()
-    .min(10, "Минимум 10 цифр")
-    .regex(/^\+?[0-9\s()-]+$/, "Некорректный номер"),
+    .regex(/^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$/, "Введите номер РФ в формате +7 (999) 999-99-99"),
   message: z.string().min(5, "Сообщение слишком короткое"),
+  privacyConsent: z
+    .boolean()
+    .refine((value) => value, "Необходимо согласие с политикой конфиденциальности"),
 });
 
 export type ContactFormValues = z.infer<typeof contactFormSchema>;

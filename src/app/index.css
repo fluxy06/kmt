@@ -1,23 +1,55 @@
 @import url("../shared/Fonts/fonts.css");
 @import "tailwindcss";
 :root {
+    --bg-primary: #050505;
+    --bg-secondary: #111827;
+    --surface: linear-gradient(155deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+    --surface-soft: linear-gradient(160deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+    /* opaque base painted under --surface so frosted panels read as glass
+       WITHOUT backdrop-filter (which forces a per-frame GPU blur of the bg) */
+    --surface-base: rgba(18, 22, 28, 0.86);
+    --border-color: rgba(255, 255, 255, 0.14);
+    --text-color: #f8fafc;
+    --subtext-color: rgba(226, 232, 240, 0.84);
+    --divider-color: #404040;
+    --control-bg: rgba(0, 0, 0, 0.45);
+    --skeleton-base: rgba(255, 255, 255, 0.06);
+    --skeleton-highlight: rgba(255, 255, 255, 0.14);
     line-height: 1.5;
     font-weight: 400;
-    color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: black;
+    color-scheme: dark;
+    color: var(--text-color);
+    background-color: var(--bg-primary);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
+:root[data-theme="light"] {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #e2e8f0;
+    --surface: linear-gradient(155deg, rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0.24));
+    --surface-soft: linear-gradient(160deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2));
+    --surface-base: rgba(255, 255, 255, 0.82);
+    --border-color: rgba(148, 163, 184, 0.34);
+    --text-color: #0f172a;
+    --subtext-color: rgba(30, 41, 59, 0.8);
+    --divider-color: rgba(100, 116, 139, 0.35);
+    --control-bg: rgba(255, 255, 255, 0.92);
+    --skeleton-base: rgba(148, 163, 184, 0.14);
+    --skeleton-highlight: rgba(148, 163, 184, 0.32);
+    color-scheme: light;
+    color: var(--text-color);
+    background-color: var(--bg-primary);
+}
+
 a {
     font-weight: 500;
     font-family: "Montserrat Alternates", sans-serif;
-    color: #ffffff;
+    color: var(--text-color);
     text-decoration: inherit;
-    transition: 0.3s ease-in-out;
+    transition: color 0.2s ease-in-out, opacity 0.2s ease-in-out;
     font-size: clamp(14px, 1.5vw, 18px);
     text-wrap: nowrap;
     @media screen and (max-width: 400px) {
@@ -28,19 +60,112 @@ a {
 body {
     margin: 0;
     display: flex;
+    width: 100%;
     min-width: 320px;
-    padding-top: 80px;
     min-height: 100vh;
+    background: transparent;
+    color: inherit;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.theme-page {
+    min-height: 100%;
+    background: radial-gradient(circle at 8% 6%, rgba(81, 213, 54, 0.12), transparent 38%), radial-gradient(circle at 92% 14%, rgba(34, 197, 94, 0.1), transparent 42%);
+    color: var(--text-color);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.theme-surface {
+    background: var(--surface), var(--surface-base);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 24px rgba(2, 6, 23, 0.16);
+}
+
+.theme-soft-surface {
+    background: var(--surface-soft);
+    border-color: var(--border-color);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.13);
+}
+
+.theme-text {
+    color: var(--text-color) !important;
+}
+
+.theme-subtext {
+    color: var(--subtext-color) !important;
+}
+
+.theme-divider {
+    background: var(--divider-color);
+}
+
+.theme-control {
+    background: var(--control-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+.theme-card {
+    background: var(--surface), var(--surface-base);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 24px rgba(2, 6, 23, 0.16);
+}
+
+.theme-border {
+    border-color: var(--border-color) !important;
+}
+
+body.admin-page {
+    padding-top: 0;
+    display: block;
 }
 
 h1 {
     font-size: 36px;
-    font-family: "Montserrat", sans-serif;
+    font-family: "Montserrat Alternates", sans-serif;
     font-weight: bold;
-    color: white;
+    color: var(--text-color);
+    @media screen and (max-width: 400px) {
+        font-size: 30px;
+    }
 }
 
 p {
     font-size: 16px;
     font-family: "Montserrat Alternates", sans-serif;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+    background: linear-gradient(
+        90deg,
+        var(--skeleton-base) 25%,
+        var(--skeleton-highlight) 50%,
+        var(--skeleton-base) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .gpu-hover-transform {
+        will-change: transform;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
 }

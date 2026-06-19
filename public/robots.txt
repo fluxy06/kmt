@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /kmt/admin/
+Disallow: /api/
+
+Sitemap: https://whysofly-web.onrender.com/sitemap.xml

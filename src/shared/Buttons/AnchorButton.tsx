@@ -1,12 +1,8 @@
-import React from "react";
-
-
 type AnchorButtonProprs = {
-    label: string;
-    onClick?: () => void;
-    width?: { min: string; preferred: string; max: string };
-}
-
+  label: string;
+  onClick?: () => void;
+  width?: { min: string; preferred: string; max: string };
+};
 
 const AnchorButton: React.FC<AnchorButtonProprs> = ({ label, onClick, width }) => {
   const widthAdaptive = width
@@ -16,17 +12,18 @@ const AnchorButton: React.FC<AnchorButtonProprs> = ({ label, onClick, width }) =
   return (
     <button
       onClick={onClick}
-      style={{ width: widthAdaptive, height: '35px' }}
+      style={{ width: widthAdaptive, height: "35px" }}
       className="
         relative
         overflow-hidden
         rounded-2xl
         cursor-pointer
-        bg-[#404040]
-        shadow-[0_3px_15px_rgba(255,255,255,0.18)]
+        border border-[var(--border-color)]
+        bg-[var(--surface)]
+        shadow-[0_8px_20px_rgba(2,6,23,0.16)]
         font-[Montserrat_Alternates]
         text-[clamp(14px,2vw,24px)]
-        text-white
+        theme-text
 
         transition-all
         duration-300
@@ -34,8 +31,8 @@ const AnchorButton: React.FC<AnchorButtonProprs> = ({ label, onClick, width }) =
 
         hover:-translate-y-[2px]
         hover:scale-[1.02]
-        hover:bg-[#505050]
-        hover:shadow-[0_12px_30px_rgba(255,255,255,0.18)]
+        hover:brightness-105
+        hover:shadow-[0_12px_30px_rgba(2,6,23,0.2)]
 
         active:scale-[0.98]
         active:translate-y-[0px]
@@ -55,7 +52,7 @@ const AnchorButton: React.FC<AnchorButtonProprs> = ({ label, onClick, width }) =
         "
         style={{
           background:
-            'radial-gradient(140% 140% at 50% -10%, rgba(255,255,255,0.45), transparent 55%)',
+            "radial-gradient(140% 140% at 50% -10%, rgba(255,255,255,0.4), transparent 55%)",
         }}
       />
 
@@ -72,17 +69,13 @@ const AnchorButton: React.FC<AnchorButtonProprs> = ({ label, onClick, width }) =
           hover:opacity-100
         "
         style={{
-          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.25)',
+          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.3)",
         }}
       />
 
-      <span className="relative z-10">
-        {label}
-      </span>
+      <span className="relative z-10">{label}</span>
     </button>
   );
 };
-
-
 
 export default AnchorButton;

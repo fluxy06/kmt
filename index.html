@@ -1,15 +1,54 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 
 <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="preconnect" href="https://whysofly-api.onrender.com" />
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin="anonymous" />
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+    <script src="/theme-init.js"></script>
+    <link rel="icon" type="image/x-icon" href="favico.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>kmt</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://*.onrender.com https://api.cloudinary.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src 'self' https://www.openstreetmap.org; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+
+    <title>КМТ — Наружная реклама в Богородске | Билборды, баннеры, ситилайты</title>
+    <meta name="description" content="Рекламное агентство КМТ в Богородске. Производство и размещение наружной рекламы: билборды, баннеры, ситилайты, вывески. Звоните: 8(930)803-33-10" />
+    <meta name="keywords" content="наружная реклама Богородск, билборды Богородск, баннеры, ситилайт, рекламное агентство КМТ" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://whysofly-web.onrender.com/" />
+    <meta property="og:title" content="КМТ — Наружная реклама в Богородске" />
+    <meta property="og:description" content="Производство и размещение наружной рекламы: билборды, баннеры, ситилайты. Рекламное агентство КМТ, Богородск." />
+    <meta property="og:locale" content="ru_RU" />
+
+    <!-- JSON-LD LocalBusiness -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "КМТ — Рекламное агентство",
+      "description": "Производство и размещение наружной рекламы: билборды, баннеры, ситилайты, вывески",
+      "url": "https://whysofly-web.onrender.com/",
+      "telephone": "+79308033310",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Богородск",
+        "addressRegion": "Нижегородская область",
+        "addressCountry": "RU"
+      },
+      "openingHours": "Mo-Fr 09:00-18:00"
+    }
+    </script>
 </head>
 
 <body>
     <div id="root"></div>
+    <script src="/runtime-config.js"></script>
     <script type="module" src="/src/app/main.tsx"></script>
 </body>
 

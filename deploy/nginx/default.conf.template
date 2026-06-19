@@ -1,0 +1,118 @@
+# Rate limiting: max 5 requests/min per IP on the contact form endpoint
+limit_req_zone $binary_remote_addr zone=contact_rl:10m rate=5r/m;
+
+server {
+    listen 8080;
+    server_name _;
+
+    # Когда контейнер стоит за хостовым reverse-proxy (VPS-деплой), реальный IP
+    # клиента приходит в X-Real-IP — без этого rate limiting считал бы все
+    # запросы с IP докер-моста одним клиентом.
+    set_real_ip_from 172.16.0.0/12;
+    set_real_ip_from 192.168.0.0/16;
+    real_ip_header X-Real-IP;
+
+    # -----------------------------------------------------------------------
+    # Security headers — applied to all locations that have NO add_header of
+    # their own (nginx does NOT inherit add_header into child blocks that
+    # define their own add_header, so we repeat them where needed below).
+    # -----------------------------------------------------------------------
+    add_header X-Content-Type-Options     "nosniff" always;
+    add_header X-Frame-Options            "DENY" always;
+    add_header X-XSS-Protection           "1; mode=block" always;
+    add_header Referrer-Policy            "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy         "camera=(), microphone=(), geolocation=()" always;
+    add_header Cross-Origin-Opener-Policy "same-origin" always;
+    add_header Strict-Transport-Security  "max-age=31536000; includeSubDomains" always;
+
+    client_max_body_size  2m;
+    client_body_timeout   12s;
+    client_header_timeout 12s;
+    send_timeout          12s;
+
+    # Admin SPA route — served by frontend, not proxied
+    location = /kmt/admin {
+        root /usr/share/nginx/html;
+        try_files /index.html =404;
+    }
+
+    location ^~ /kmt/admin/ {
+        root /usr/share/nginx/html;
+        try_files /index.html =404;
+    }
+
+    # Contact form — rate-limited
+    location = /kmt/contact {
+        limit_req zone=contact_rl burst=3 nodelay;
+        limit_req_status 429;
+        proxy_pass        ${API_UPSTREAM};
+        proxy_http_version 1.1;
+        proxy_set_header  Host              $proxy_host;
+        proxy_set_header  X-Real-IP         $remote_addr;
+        proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Proto $scheme;
+        proxy_ssl_server_name on;
+        proxy_connect_timeout 10s;
+        proxy_read_timeout    15s;
+        proxy_send_timeout    15s;
+    }
+
+    location /kmt/ {
+        proxy_pass        ${API_UPSTREAM};
+        proxy_http_version 1.1;
+        proxy_set_header  Host              $proxy_host;
+        proxy_set_header  X-Real-IP         $remote_addr;
+        proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Proto $scheme;
+        proxy_ssl_server_name on;
+        proxy_connect_timeout 10s;
+        proxy_read_timeout    60s;
+    }
+
+    location /api/kmt/admin/ {
+        proxy_pass        ${API_UPSTREAM}/kmt/admin/;
+        proxy_http_version 1.1;
+        proxy_set_header  Host              $proxy_host;
+        proxy_set_header  X-Real-IP         $remote_addr;
+        proxy_set_header  X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Proto $scheme;
+        proxy_ssl_server_name on;
+    }
+
+    # runtime-config.js — no-cache + security headers (add_header overrides parent)
+    location = /runtime-config.js {
+        alias        /etc/nginx/conf.d/runtime-config.js;
+        default_type application/javascript;
+        access_log   off;
+        expires      -1;
+        add_header Cache-Control              "no-store, no-cache, must-revalidate, proxy-revalidate" always;
+        add_header X-Content-Type-Options     "nosniff" always;
+        add_header X-Frame-Options            "DENY" always;
+        add_header X-XSS-Protection           "1; mode=block" always;
+        add_header Referrer-Policy            "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy         "camera=(), microphone=(), geolocation=()" always;
+        add_header Cross-Origin-Opener-Policy "same-origin" always;
+        add_header Strict-Transport-Security  "max-age=31536000; includeSubDomains" always;
+    }
+
+    # Fingerprinted static assets — long-term cache + security headers
+    location ~* \.(?:js|css|woff2?|png|jpg|jpeg|gif|svg|ico)$ {
+        root       /usr/share/nginx/html;
+        access_log off;
+        expires    30d;
+        add_header Cache-Control              "public, max-age=2592000, immutable" always;
+        add_header X-Content-Type-Options     "nosniff" always;
+        add_header X-Frame-Options            "DENY" always;
+        add_header X-XSS-Protection           "1; mode=block" always;
+        add_header Referrer-Policy            "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy         "camera=(), microphone=(), geolocation=()" always;
+        add_header Cross-Origin-Opener-Policy "same-origin" always;
+        add_header Strict-Transport-Security  "max-age=31536000; includeSubDomains" always;
+        try_files  $uri =404;
+    }
+
+    location / {
+        root      /usr/share/nginx/html;
+        try_files $uri /index.html;
+    }
+}

@@ -73,3 +73,12 @@ export default defineConfig([
   },
 ])
 ```
+
+
+## Production DDoS protection
+Frontend changes alone do **not** provide full DDoS protection. Use infrastructure controls:
+- Edge/CDN protection + WAF + bot challenge
+- Reverse-proxy rate limits and connection caps
+- Backend per-endpoint throttling
+
+A ready example is available in `deploy/nginx/security.conf.example`.
